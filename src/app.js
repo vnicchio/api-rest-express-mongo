@@ -13,17 +13,6 @@ app.use(express.json());
 
 routes(app);
 
-app.put('/books/:id', (req, res) => {
-    let index = getBook(req.params.id);
-    res.json(books[index]);
-})
-
-app.put('/books/:id', (req, res) => {
-    let index = getBook(req.params.id);
-    books[index].title = req.body.title;
-    res.json(books);
-})
-
 app.delete('/books/:id', (req, res) => {
     let {id} = req.params;
     let index = getBook(id);

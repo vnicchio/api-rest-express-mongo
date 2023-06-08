@@ -7,6 +7,16 @@ class BookController {
     })
   }
 
+  static getBookById = (req, res) => {
+    const id = req.params.id;
+    
+    books.findById(id).then(book => {
+      res.status(200).json(book);
+    }).catch(err => {
+      res.status(500).send({message: err.message})
+    });
+  }
+
   static postBook = (req, res) => {
     let book = new books(req.body)
 
@@ -15,8 +25,6 @@ class BookController {
     }).catch(err => {
       res.status(500).send({message: err.message})
     });
-
-    
   }
 
   static putBook = (req, res) => {
