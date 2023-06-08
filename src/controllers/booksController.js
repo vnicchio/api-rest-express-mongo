@@ -1,17 +1,34 @@
 import books from "../models/Book.js"
 
 class BookController {
-  static getBooks = async (req, res) => {
-    let result = await books.find({})
-    res.status(200).json(result);
+  static getBooks = (req, res) => {
+    books.find({}).then(result => {
+      res.status(200).json(result);
+    })
   }
 
-  static postBook = async (req, res) => {
+  static postBook = (req, res) => {
     let book = new books(req.body)
 
-    let response = await book.save();
+    book.save().then(result => {
+      res.status(201).send(book.toJSON())
+    }).catch(err => {
+      res.status(500).send({message: err.message})
+    });
 
-    res.status(201).send(book.toJSON())
+    
+  }
+
+  static putBook = (req, res) => {
+    const id = req.params.id;
+
+    books.findByIdAndUpdate(id, req.body).then(book => {
+      res.status(200).json(book);
+    }).catch(err => {
+      res.status(500).send({message: err.message})
+    });
+
+    
   }
 }
 
