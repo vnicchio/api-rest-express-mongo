@@ -32,6 +32,13 @@ app.put('/books/:id', (req, res) => {
     res.json(books);
 })
 
+app.delete('/books/:id', (req, res) => {
+    let {id} = req.params;
+    let index = getBook(id);
+    books.splice(index, 1);
+    res.send(`Book ${id} has been removed successfully`);
+})
+
 function getBook(id) {
     return books.findIndex(book => book.id == id);
 }
