@@ -1,6 +1,7 @@
 import express from "express";
 import db from "./config/dbConnect.js"
 import books from "./models/Book.js"
+import routes from "./routes/index.js"
 
 db.on("error", console.log.bind(console, "Connection db error"));
 db.once("open", () => {
@@ -10,19 +11,7 @@ db.once("open", () => {
 const app = express();
 app.use(express.json());
 
-// const books = [
-//     {id: 1, title: 'The Lord of the Rings'},
-//     {id: 2, title: 'Harry Potter'}
-// ]
-
-app.get('/', (req, res) => {
-    res.status(200).send('Node course');
-})
-
-app.get('/books', async (req, res) => {
-    let result = await books.find({})
-    res.status(200).json(result);
-})
+routes(app);
 
 app.put('/books/:id', (req, res) => {
     let index = getBook(req.params.id);
