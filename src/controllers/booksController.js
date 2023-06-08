@@ -9,7 +9,7 @@ class BookController {
 
   static getBookById = (req, res) => {
     const id = req.params.id;
-    
+
     books.findById(id).then(book => {
       res.status(200).json(book);
     }).catch(err => {
@@ -35,8 +35,16 @@ class BookController {
     }).catch(err => {
       res.status(500).send({message: err.message})
     });
+  }
 
-    
+  static deleteBook = (req, res) => {
+    const id = req.params.id;
+
+    books.findByIdAndDelete(id).then(() => {
+      res.status(200).send({message: 'The book has been deleted!'});
+    }).catch(err => {
+      res.status(500).send({message: err.message})
+    });
   }
 }
 
