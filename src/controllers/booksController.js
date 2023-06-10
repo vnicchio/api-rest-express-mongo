@@ -2,7 +2,7 @@ import books from "../models/Book.js"
 
 class BookController {
   static getBooks = (req, res) => {
-    books.find({}).then(result => {
+    books.find().populate('author').exec().then(result => {
       res.status(200).json(result);
     })
   }
@@ -10,7 +10,7 @@ class BookController {
   static getBookById = (req, res) => {
     const id = req.params.id;
 
-    books.findById(id).then(book => {
+    books.findById(id).populate('author', 'name').exec().then(book => {
       res.status(200).json(book);
     }).catch(err => {
       res.status(500).send({message: err.message})
