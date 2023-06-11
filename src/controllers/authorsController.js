@@ -1,17 +1,17 @@
 import authors from "../models/Author.js";
 
 class AuthorController {
-	static getAuthors = async (req, res) => {
+	static getAuthors = async (req, res, next) => {
 		try {
 			const result = await authors.find({});
 
 			res.status(200).json(result);
 		} catch (error) {
-			res.status(500).json({message: error.message});
+			next(error);
 		}
 	};
 
-	static getAuthorById = async (req, res) => {
+	static getAuthorById = async (req, res, next) => {
 		try {
 			const id = req.params.id;
 			const author = await authors.findById(id);
@@ -22,21 +22,21 @@ class AuthorController {
 				res.status(404).send({message: "Author doesn't exist"});
 			}
 		} catch (error) {
-			res.status(500).send({message: error.message});
+			next(error);
 		}
 	};
 
-	static postAuthor = async (req, res) => {
+	static postAuthor = async (req, res, next) => {
 		let author = new authors(req.body);
 
 		author.save().then(result => {
 			res.status(201).send(result.toJSON());
-		}).catch(err => {
-			res.status(500).send({message: err.message});
+		}).catch(error => {
+			next(error);
 		});
 	};
 
-	static putAuthor = async (req, res) => {
+	static putAuthor = async (req, res, next) => {
 		try {
 			const id = req.params.id;
 
@@ -44,11 +44,11 @@ class AuthorController {
 
 			res.status(200).json(author);
 		} catch (error) {
-			res.status(500).send({message: error.message});
+			next(error);
 		}
 	};
 
-	static deleteAuthor = async (req, res) => {
+	static deleteAuthor = async (req, res, next) => {
 		try {
 			const id = req.params.id;
 
@@ -56,7 +56,7 @@ class AuthorController {
 
 			res.status(200).send({message: "The author has been deleted!"});
 		} catch (error) {
-			res.status(500).send({message: error.message});
+			next(error);
 		}
 	};
 }
