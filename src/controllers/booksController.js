@@ -38,7 +38,7 @@ class BookController {
 			}
 
 			if(title) {
-				filter.title = title;
+				filter.title = {$regex: title, $options: "i"};
 			}
 
 			let result = await books.find(filter, {});
