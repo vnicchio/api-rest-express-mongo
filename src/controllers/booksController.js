@@ -1,3 +1,4 @@
+import NotFound from "../errors/NotFound.js";
 import books from "../models/Book.js";
 
 class BookController {
@@ -19,7 +20,7 @@ class BookController {
 			if (book !== null) {
 				res.status(200).send(book);
 			} else {
-				res.status(404).send({message: "Author doesn't exist"});
+				next(new NotFound("Book doesn't exists"));
 			}
 		} catch (error) {
 			next(error);
@@ -51,9 +52,13 @@ class BookController {
 	static putBook = async (req, res, next) => {
 		try {
 			const id = req.params.id;
-			const result = await books.findByIdAndUpdate(id, req.body);
+			const book = await books.findByIdAndUpdate(id, req.body);
 
-			res.status(200).json(result);
+			if (book !== null) {
+				res.status(200).json(book);
+			} else {
+				next(new NotFound("Book doesn't exists"));
+			}
 
 		} catch (error) {
 			next(error);
@@ -63,9 +68,13 @@ class BookController {
 	static deleteBook = async (req, res, next) => {
 		try {
 			const id = req.params.id;
-			await books.findByIdAndDelete(id);
+			const book = await books.findByIdAndDelete(id);
 
-			res.status(200).send({message: "The book has been deleted!"});
+			if (book !== null) {
+				res.status(200).send({message: "The book has been deleted!"});
+			} else {
+				next(new NotFound("Book doesn't exists"));
+			}
 
 		} catch (error) {
 			next(error);

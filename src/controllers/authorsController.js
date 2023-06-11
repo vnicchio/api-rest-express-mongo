@@ -1,3 +1,4 @@
+import NotFound from "../errors/NotFound.js";
 import authors from "../models/Author.js";
 
 class AuthorController {
@@ -19,7 +20,7 @@ class AuthorController {
 			if (author !== null) {
 				res.status(200).send(author);
 			} else {
-				res.status(404).send({message: "Author doesn't exist"});
+				next(new NotFound("Author doesn't exists"));
 			}
 		} catch (error) {
 			next(error);
@@ -40,9 +41,13 @@ class AuthorController {
 		try {
 			const id = req.params.id;
 
-			const author = authors.findByIdAndUpdate(id, req.body);
+			const author = await authors.findByIdAndUpdate(id, req.body);
+			if (author !== null) {
+				res.status(200).send(author);
+			} else {
+				next(new NotFound("Author doesn't exists"));
+			}
 
-			res.status(200).json(author);
 		} catch (error) {
 			next(error);
 		}
@@ -52,9 +57,15 @@ class AuthorController {
 		try {
 			const id = req.params.id;
 
-			await authors.findByIdAndDelete(id);
+			const author = await authors.findByIdAndDelete(id);
 
-			res.status(200).send({message: "The author has been deleted!"});
+			if (author !== null) {
+				res.status(200).send({message: "The author has been deleted!"});
+			} else {
+				next(new NotFound("Author doesn't exists"));
+			}
+
+			
 		} catch (error) {
 			next(error);
 		}
