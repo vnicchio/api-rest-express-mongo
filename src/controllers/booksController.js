@@ -4,7 +4,12 @@ import {authors, books} from "../models/index.js";
 class BookController {
 	static getBooks = async (req, res, next) => {
 		try {
-			const result = await books.find().populate("author").exec();
+			let {limit = 5, page = 1} = req.query;
+
+			limit = parseInt(limit);
+			page = parseInt(page);
+      
+			const result = await books.find().populate("author").skip((page-1) * limit).limit(limit).exec();
 
 			res.status(200).json(result);
 		} catch (error) {
