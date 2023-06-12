@@ -1,5 +1,5 @@
 import NotFound from "../errors/NotFound.js";
-import {books} from "../models/index.js";
+import {authors, books} from "../models/index.js";
 
 class BookController {
 	static getBooks = async (req, res, next) => {
@@ -29,20 +29,15 @@ class BookController {
 
 	static getBookByFilter = async (req, res, next) => {
 		try {
-			const {publisher, title} = req.query;
+			const filter = await processSearch(req.query);
 
-			const filter = {};
-
-			if(publisher) {
-				filter.publisher = publisher;
+			if (filter !== null) {
+				let result = await books.find(filter).populate("author");
+				res.status(200).send(result);
+			} else {
+				res.status(200).send([]);
 			}
-
-			if(title) {
-				filter.title = {$regex: title, $options: "i"};
-			}
-
-			let result = await books.find(filter, {});
-			res.status(200).send(result);
+			
 		} catch (error) {
 			next(error);
 		}
@@ -90,6 +85,45 @@ class BookController {
 			next(error);
 		}
 	};
+}
+
+async function processSearch(params) {
+	const {publisher, title, minPages, maxPages, author} = params;
+
+	let filter = {};
+
+	if (publisher) {
+		filter.publisher = publisher;
+	}
+
+	if (title) {
+		filter.title = {$regex: title, $options: "i"};
+	}
+
+	if (minPages || maxPages) {
+		filter.pages = {};
+	}
+
+	if (minPages) {
+		filter.pages.$gte = minPages;
+	}
+
+	if (maxPages) {
+		filter.pages.$lte = maxPages;
+	}
+
+	if (author) {
+		const targetAuthor = await authors.findOne({name: author});
+
+		if (targetAuthor !== null) {
+			const authorId = targetAuthor._id;
+			filter.author = authorId;
+		} else {
+			filter = null;
+		}
+	}
+
+	return filter;
 }
 
 export default BookController;
