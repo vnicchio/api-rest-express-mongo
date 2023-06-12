@@ -4,12 +4,20 @@ import {authors, books} from "../models/index.js";
 class BookController {
 	static getBooks = async (req, res, next) => {
 		try {
-			let {limit = 5, page = 1} = req.query;
+			let {limit = 5, page = 1, orderBy = "_id:1"} = req.query;
+
+			let [paramOrder, order] = orderBy.split(":");
 
 			limit = parseInt(limit);
 			page = parseInt(page);
+			order = parseInt(order);
       
-			const result = await books.find().populate("author").skip((page-1) * limit).limit(limit).exec();
+			const result = await books.find()
+				.populate("author")
+				.skip((page-1) * limit)
+				.limit(limit)
+				.sort({ [paramOrder] : order})
+				.exec();
 
 			res.status(200).json(result);
 		} catch (error) {
