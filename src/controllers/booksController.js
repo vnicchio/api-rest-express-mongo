@@ -4,22 +4,11 @@ import {authors, books} from "../models/index.js";
 class BookController {
 	static getBooks = async (req, res, next) => {
 		try {
-			let {limit = 5, page = 1, orderBy = "_id:1"} = req.query;
+			const result = books.find().populate("author");
 
-			let [paramOrder, order] = orderBy.split(":");
+			req.parameter = result;
 
-			limit = parseInt(limit);
-			page = parseInt(page);
-			order = parseInt(order);
-      
-			const result = await books.find()
-				.populate("author")
-				.skip((page-1) * limit)
-				.limit(limit)
-				.sort({ [paramOrder] : order})
-				.exec();
-
-			res.status(200).json(result);
+			next();
 		} catch (error) {
 			next(error);
 		}
@@ -45,8 +34,11 @@ class BookController {
 			const filter = await processSearch(req.query);
 
 			if (filter !== null) {
-				let result = await books.find(filter).populate("author");
-				res.status(200).send(result);
+				let result = books.find(filter).populate("author");
+				
+				req.parameter = result;
+
+				next();
 			} else {
 				res.status(200).send([]);
 			}
